@@ -1,5 +1,9 @@
 # shAI
 
+[![npm version](https://img.shields.io/npm/v/shai-cli.svg)](https://www.npmjs.com/package/shai-cli)
+[![CI](https://github.com/lixiaoxie/shAI/actions/workflows/ci.yml/badge.svg)](https://github.com/lixiaoxie/shAI/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 **AI-powered shell command assistant** — describe what you want in natural language, get the right command.
 
 [中文](#中文说明) | [English](#english)
