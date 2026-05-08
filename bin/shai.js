@@ -38,7 +38,17 @@ function readPipeInput() {
   });
 }
 
-const VERSION = '1.0.0';
+const VERSION = '1.0.1';
+
+// Mask a URL to hide the hostname, keeping only protocol and path.
+function maskUrl(url) {
+  try {
+    const u = new URL(url);
+    return `${u.protocol}//****${u.pathname}`;
+  } catch {
+    return '****';
+  }
+}
 
 // Initialize language setting
 function initLanguage() {
@@ -68,7 +78,11 @@ async function main() {
     if (!cfg) {
       console.error(t('configNotFound'));
     } else {
-      const masked = { ...cfg, api_key: cfg.api_key ? '****' + cfg.api_key.slice(-4) : t('configNotSet') };
+      const masked = {
+        ...cfg,
+        api_url: cfg.api_url ? maskUrl(cfg.api_url) : t('configNotSet'),
+        api_key: cfg.api_key ? '****' + cfg.api_key.slice(-4) : t('configNotSet'),
+      };
       console.error(`${t('configFile')}: ${CONFIG_FILE}\n`);
       console.error(JSON.stringify(masked, null, 2));
     }
@@ -89,7 +103,10 @@ async function main() {
       cfg[field] = field === 'lang' ? (value === 'zh' ? 'zh' : 'en') : value;
       saveConfig(cfg);
       if (field === 'lang') setLanguage(cfg.lang);
-      console.error(`✅ ${field} ${t('configUpdated')}: ${field === 'api_key' ? '****' + value.slice(-4) : cfg[field]}`);
+      const displayVal = field === 'api_key' ? '****' + value.slice(-4)
+        : field === 'api_url' ? maskUrl(cfg[field])
+        : cfg[field];
+      console.error(`✅ ${field} ${t('configUpdated')}: ${displayVal}`);
       process.exit(0);
     }
   }

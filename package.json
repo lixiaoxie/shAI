@@ -1,6 +1,6 @@
 {
   "name": "shai-cli",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "AI-powered shell command assistant — describe what you want in natural language, get the right command.",
   "type": "module",
   "bin": {

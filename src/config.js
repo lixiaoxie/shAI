@@ -40,8 +40,10 @@ export async function setupInteractive() {
 
   console.error(`\n${t('configTitle')}\n`);
 
-  const api_url = await ask(rl, `${t('configApiUrl')} [${existing.api_url}]: `, existing.api_url);
-  const api_key = await ask(rl, `${t('configApiKey')} [${existing.api_key ? '****' + existing.api_key.slice(-4) : t('configNotSet')}]: `, existing.api_key);
+  const maskedUrl = existing.api_url ? maskConfigUrl(existing.api_url) : t('configNotSet');
+  const maskedKey = existing.api_key ? '****' + existing.api_key.slice(-4) : t('configNotSet');
+  const api_url = await ask(rl, `${t('configApiUrl')} [${maskedUrl}]: `, existing.api_url);
+  const api_key = await ask(rl, `${t('configApiKey')} [${maskedKey}]: `, existing.api_key);
   const model = await ask(rl, `${t('configModel')} [${existing.model}]: `, existing.model);
   const lang = await ask(rl, `${t('configLang')} (zh/en) [${existing.lang}]: `, existing.lang);
 
@@ -51,4 +53,13 @@ export async function setupInteractive() {
   saveConfig(cfg);
   console.error(`\n${t('configSaved')} ${CONFIG_FILE}\n`);
   return cfg;
+}
+
+function maskConfigUrl(url) {
+  try {
+    const u = new URL(url);
+    return `${u.protocol}//****${u.pathname}`;
+  } catch {
+    return '****';
+  }
 }
