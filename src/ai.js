@@ -27,11 +27,11 @@ const CHAT_SYSTEM_PROMPT = `You are shAI, a helpful command-line AI assistant. T
 - For error messages: explain what went wrong, why, and how to fix it.`;
 
 /**
- * 流式调用 OpenAI 兼容 API。
+ * Stream call to OpenAI-compatible API.
  * @param {object} config - { api_url, api_key, model }
- * @param {string} query - 用户的自然语言请求
- * @param {string|null} terminalContext - 终端上下文
- * @param {string|null} toolsSummary - 系统工具摘要
+ * @param {string} query - user's natural language request
+ * @param {string|null} terminalContext - terminal context
+ * @param {string|null} toolsSummary - system tools summary
  * @param {object} callbacks - { onThinking(text), onContent(text), onDone(), onError(err) }
  * @param {object} [options] - { mode: 'command' | 'chat' }
  */
@@ -108,7 +108,7 @@ export function streamCommand(config, query, terminalContext, toolsSummary, call
           const delta = json.choices?.[0]?.delta;
           if (!delta) continue;
 
-          // 支持 thinking/reasoning 内容（DeepSeek、OpenAI o-series 等）
+          // Support thinking/reasoning content (DeepSeek, OpenAI o-series, etc.)
           const thinking = delta.reasoning_content || delta.thinking;
           if (thinking) {
             callbacks.onThinking(thinking);
@@ -119,12 +119,12 @@ export function streamCommand(config, query, terminalContext, toolsSummary, call
             callbacks.onContent(content);
           }
         } catch {
-          // 忽略解析失败的行
+          // Ignore lines that fail to parse
         }
       }
     });
     res.on('end', () => {
-      // 处理残留 buffer
+      // Process remaining buffer
       if (buffer.trim()) {
         const trimmed = buffer.trim();
         if (trimmed.startsWith('data: ') && trimmed.slice(6) !== '[DONE]') {
@@ -151,7 +151,7 @@ export function streamCommand(config, query, terminalContext, toolsSummary, call
 }
 
 /**
- * 非流式调用（保留作为 fallback）。
+ * Non-streaming call (kept as fallback).
  */
 export async function getCommand(config, query, terminalContext, toolsSummary) {
   return new Promise((resolve, reject) => {

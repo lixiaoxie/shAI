@@ -21,7 +21,7 @@ import {
 import { setLanguage, t, getHelpText } from '../src/i18n.js';
 
 /**
- * 读取管道输入（stdin 非 TTY 时）。
+ * Read pipe input (when stdin is not a TTY).
  */
 function readPipeInput() {
   return new Promise((resolve) => {
@@ -33,14 +33,14 @@ function readPipeInput() {
       const text = chunks.join('').trim();
       resolve(text || null);
     });
-    // 超时保护
+    // Timeout protection
     setTimeout(() => resolve(chunks.join('').trim() || null), 3000);
   });
 }
 
 const VERSION = '1.0.0';
 
-// 初始化语言设置
+// Initialize language setting
 function initLanguage() {
   const cfg = loadConfig();
   if (cfg?.lang) setLanguage(cfg.lang);
@@ -50,7 +50,7 @@ async function main() {
   initLanguage();
   const args = process.argv.slice(2);
 
-  // 无参数或帮助
+  // No arguments or help
   if (args.length === 0 || args.includes('--help') || args.includes('-h')) {
     console.error(getHelpText(VERSION));
     process.exit(0);
@@ -62,7 +62,7 @@ async function main() {
     process.exit(0);
   }
 
-  // --config 显示当前配置
+  // --config show current configuration
   if (args.includes('--config')) {
     const cfg = loadConfig();
     if (!cfg) {
@@ -75,7 +75,7 @@ async function main() {
     process.exit(0);
   }
 
-  // --set-url / --set-key / --set-model / --set-lang 快捷设置
+  // --set-url / --set-key / --set-model / --set-lang quick setters
   const setters = { '--set-url': 'api_url', '--set-key': 'api_key', '--set-model': 'model', '--set-lang': 'lang' };
   for (const [flag, field] of Object.entries(setters)) {
     const idx = args.indexOf(flag);
@@ -94,13 +94,13 @@ async function main() {
     }
   }
 
-  // 子命令：config
+  // Subcommand: config
   if (args[0] === 'config') {
     await setupInteractive();
     process.exit(0);
   }
 
-  // 子命令：chat（通用问答模式）
+  // Subcommand: chat (general Q&A mode)
   if (args[0] === 'chat') {
     const chatQuery = args.slice(1).join(' ');
     if (!chatQuery.trim()) {
@@ -124,26 +124,26 @@ async function main() {
     process.exit(0);
   }
 
-  // 子命令：cmd（自定义命令管理）
+  // Subcommand: cmd (custom command management)
   if (args[0] === 'cmd') {
     handleCmdSubcommand(args.slice(1));
     process.exit(0);
   }
 
-  // 子命令：mem（记忆管理）
+  // Subcommand: mem (memory management)
   if (args[0] === 'mem') {
     handleMemSubcommand(args.slice(1));
     process.exit(0);
   }
 
-  // 加载配置
+  // Load configuration
   let config = loadConfig();
   if (!config || !config.api_key) {
     console.error(`${t('firstTimeConfig')}\n`);
     config = await setupInteractive();
   }
 
-  // 过滤掉 flags，提取纯查询文本
+  // Filter out flags, extract the query text
   const flags = new Set(['--no-context', '--no-check', '--save']);
   const noContext = args.includes('--no-context');
   const noCheck = args.includes('--no-check');
@@ -155,23 +155,23 @@ async function main() {
     process.exit(0);
   }
 
-  // 获取管道输入（如果有的话）
+  // Get pipe input (if any)
   const pipeInput = await readPipeInput();
 
-  // 获取终端上下文（可通过 --no-context 跳过；管道输入时不读取终端上下文）
+  // Get terminal context (skipped with --no-context; not read when pipe input is present)
   const ctx = noContext || pipeInput ? null : getTerminalContext();
   const toolsSummary = getSystemToolsSummary();
   const memorySummary = getMemorySummary();
 
-  // 合并工具摘要和记忆
+  // Merge tools summary and memory
   const fullContext = [toolsSummary, memorySummary].filter(Boolean).join('\n');
 
-  // 如果有管道输入，追加到终端上下文
+  // If pipe input exists, append to terminal context
   const effectiveCtx = pipeInput
     ? `Piped input (output from previous command):\n\`\`\`\n${pipeInput.slice(0, 4000)}\n\`\`\``
     : ctx;
 
-  // 流式调用 AI
+  // Stream call to AI
   printThinking();
   const cmd = await streamGetCommand(config, query, effectiveCtx, fullContext);
 
@@ -180,18 +180,18 @@ async function main() {
     process.exit(1);
   }
 
-  // 如果 AI 返回的全是注释，直接输出
+  // If AI returned only comments, output directly
   if (cmd.split('\n').every((l) => l.startsWith('# ') || !l.trim())) {
     console.error(cmd);
     process.exit(0);
   }
 
-  // 检查命令可用性（可通过 --no-check 跳过）
+  // Check command availability (skipped with --no-check)
   if (!noCheck) {
     checkCommandAvailability(cmd);
   }
 
-  // 确认并执行
+  // Confirm and execute
   let finalCmd = cmd;
   let action = await confirmRun();
 
@@ -206,13 +206,13 @@ async function main() {
     process.exit(0);
   }
 
-  // 记忆保存逻辑：
-  // 1. 用户按 s → 保存
-  // 2. --save flag → 保存
-  // 3. 命令复杂度高 → 自动保存（管道、多命令、长度>60字符）
+  // Memory save logic:
+  // 1. User presses s → save
+  // 2. --save flag → save
+  // 3. High command complexity → auto-save (pipes, multi-command, length > 60 chars)
   const shouldAutoSave = autoSave || isComplexCommand(finalCmd);
   if (action === 'save' || shouldAutoSave) {
-    // 检查是否已存在相同命令的记忆，避免重复
+    // Check if a memory with the same command already exists to avoid duplicates
     const existing = searchMemory('').find((e) => e.command === finalCmd);
     if (!existing) {
       const id = saveMemory({ query, command: finalCmd });
@@ -220,7 +220,7 @@ async function main() {
     }
   }
 
-  // 执行命令
+  // Execute command
   try {
     execSync(finalCmd, { stdio: 'inherit', shell: process.env.SHELL || true });
   } catch (e) {
@@ -269,8 +269,8 @@ function streamChat(config, query, ctx, toolsSummary) {
 }
 
 /**
- * 判断命令是否复杂（值得自动保存）。
- * 复杂标准：含管道/多命令/子shell/长度>60/多行
+ * Determine if a command is complex (worth auto-saving).
+ * Complexity criteria: contains pipes/multi-commands/subshells/length > 60/multi-line
  */
 function isComplexCommand(cmd) {
   if (cmd.length > 60) return true;
@@ -278,14 +278,14 @@ function isComplexCommand(cmd) {
   if (cmd.includes('&&') || cmd.includes('||')) return true;
   if (cmd.includes('$(') || cmd.includes('`')) return true;
   if (cmd.split('\n').filter((l) => l.trim()).length > 1) return true;
-  // 含有复杂参数模式（正则、awk、sed 等）
+  // Contains complex argument patterns (regex, awk, sed, etc.)
   if (/\b(awk|sed|perl|xargs|find .+ -exec)\b/.test(cmd)) return true;
   return false;
 }
 
 function checkCommandAvailability(cmdString) {
   const cmds = extractCommands(cmdString);
-  // shell 内建命令不需要检查
+  // Shell builtins don't need checking
   const builtins = new Set([
     'echo', 'cd', 'pwd', 'export', 'source', 'alias', 'unalias', 'type',
     'read', 'eval', 'exec', 'set', 'unset', 'shift', 'test', 'true', 'false',

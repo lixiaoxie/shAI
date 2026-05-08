@@ -2,15 +2,15 @@ import { execSync } from 'node:child_process';
 import os from 'node:os';
 
 /**
- * 尝试获取终端中最近的内容作为上下文。
- * 优先级：tmux > script 环境变量 > shell history。
+ * Try to get recent terminal content as context.
+ * Priority: tmux > script env var > shell history.
  */
 export function getTerminalContext(maxLines = 50) {
   // 1. tmux
   const tmuxCtx = tryTmux(maxLines);
   if (tmuxCtx) return tmuxCtx;
 
-  // 2. shell history（兜底）
+  // 2. Shell history (fallback)
   return tryShellHistory(maxLines);
 }
 
@@ -42,7 +42,7 @@ function tryShellHistory(maxLines) {
       timeout: 2000,
       stdio: ['pipe', 'pipe', 'pipe'],
     });
-    // zsh history 格式清洗（去掉 : 1234:0; 前缀）
+    // Clean zsh history format (strip `: 1234:0;` prefix)
     const lines = buf
       .split('\n')
       .map((l) => l.replace(/^: \d+:\d+;/, '').trim())

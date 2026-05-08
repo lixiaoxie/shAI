@@ -204,7 +204,7 @@ export function getLanguage() {
 }
 
 /**
- * 获取翻译文本。支持模板变量替换：t('key', { cmd: 'jq', n: 5 })
+ * Get translated text. Supports template variable substitution: t('key', { cmd: 'jq', n: 5 })
  */
 export function t(key, vars = {}) {
   let text = messages[currentLang]?.[key] || messages.en[key] || key;

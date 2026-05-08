@@ -6,8 +6,8 @@ import os from 'node:os';
 const CUSTOM_COMMANDS_FILE = path.join(os.homedir(), '.shai', 'commands.json');
 
 /**
- * 加载用户自定义命令列表。
- * 格式: { "命令名": { desc, helpText? } | "说明字符串" }
+ * Load user-defined custom commands.
+ * Format: { "commandName": { desc, helpText? } | "description string" }
  */
 export function loadCustomCommands() {
   try {
@@ -25,8 +25,8 @@ export function saveCustomCommands(cmds) {
 }
 
 /**
- * 尝试学习命令的用法（通过 --help 或 man）。
- * 返回帮助文本摘要（截取前 80 行），或 null。
+ * Try to learn command usage (via --help or man).
+ * Returns a help text summary (first 80 lines), or null.
  */
 export function learnCommand(cmd) {
   const attempts = [`${cmd} --help`, `${cmd} -h`, `man ${cmd} 2>/dev/null | col -bx | head -80`];
@@ -40,12 +40,12 @@ export function learnCommand(cmd) {
       });
       const text = output.trim();
       if (text.length > 20) {
-        // 截取前 80 行，避免过长
+        // Truncate to first 80 lines to avoid excessive length
         const lines = text.split('\n').slice(0, 80);
         return lines.join('\n');
       }
     } catch {
-      // --help 某些命令会以非零退出码返回帮助文本
+      // Some commands return help text with a non-zero exit code
       try {
         const output = execSync(`${attempt} 2>&1`, {
           encoding: 'utf-8',
@@ -64,7 +64,7 @@ export function learnCommand(cmd) {
 }
 
 /**
- * 检查命令是否在系统 PATH 中存在。
+ * Check if a command exists in the system PATH.
  */
 export function commandExists(cmd) {
   try {
@@ -81,26 +81,26 @@ export function commandExists(cmd) {
 }
 
 /**
- * 从命令字符串中提取主命令名（第一个 token，跳过 sudo/env 等前缀）。
+ * Extract the main command name from a command string (first token, skipping sudo/env prefixes).
  */
 export function extractCommands(cmdString) {
   const cmds = new Set();
   const lines = cmdString.split('\n').filter((l) => l.trim() && !l.trim().startsWith('#'));
 
   for (const line of lines) {
-    // 按管道和逻辑操作符拆分
+    // Split by pipe and logical operators
     const parts = line.split(/[|;&]/).map((s) => s.trim()).filter(Boolean);
     for (const part of parts) {
       const tokens = part.split(/\s+/);
       let i = 0;
-      // 跳过前缀
+      // Skip prefixes
       const prefixes = new Set(['sudo', 'env', 'nohup', 'time', 'nice', 'ionice', 'strace', 'xargs']);
       while (i < tokens.length && prefixes.has(tokens[i])) i++;
-      // 跳过环境变量赋值 (VAR=val)
+      // Skip environment variable assignments (VAR=val)
       while (i < tokens.length && /^\w+=/.test(tokens[i])) i++;
       if (i < tokens.length) {
         const cmd = tokens[i];
-        // 排除 shell 内建和路径形式
+        // Exclude shell builtins and path-style commands
         if (!cmd.startsWith('/') && !cmd.startsWith('./') && !cmd.startsWith('$')) {
           cmds.add(cmd);
         }
@@ -111,13 +111,13 @@ export function extractCommands(cmdString) {
 }
 
 /**
- * 为不存在的命令生成安装建议。
+ * Generate install suggestions for missing commands.
  */
 export function getInstallSuggestion(cmd) {
   const isMac = process.platform === 'darwin';
   const suggestions = [];
 
-  // 常见包管理器映射
+  // Common package manager mappings
   const brewMap = {
     jq: 'jq', rg: 'ripgrep', fd: 'fd', bat: 'bat', exa: 'exa', eza: 'eza',
     htop: 'htop', tree: 'tree', wget: 'wget', httpie: 'httpie', http: 'httpie',
@@ -143,7 +143,7 @@ export function getInstallSuggestion(cmd) {
     suggestions.push(`pip install ${cmd}`);
   }
 
-  // npm 全局工具
+  // npm global tools
   const npmPackages = new Set([
     'tldr', 'serve', 'nodemon', 'pm2', 'prettier', 'eslint', 'ts-node', 'tsx',
     'npx', 'create-react-app', 'vercel', 'netlify-cli',
@@ -161,12 +161,12 @@ export function getInstallSuggestion(cmd) {
 }
 
 /**
- * 获取系统可用工具摘要（传给 AI 的上下文）。
+ * Get a summary of available system tools (context for AI).
  */
 export function getSystemToolsSummary() {
   const parts = [];
 
-  // 自定义命令
+  // Custom commands
   const custom = loadCustomCommands();
   const customEntries = Object.entries(custom);
   if (customEntries.length > 0) {
@@ -178,7 +178,7 @@ export function getSystemToolsSummary() {
     parts.push('User-defined shortcuts (name → actual command/description):\n' + lines.join('\n'));
   }
 
-  // 检测常用工具
+  // Detect common tools
   const tools = [
     'jq', 'rg', 'fd', 'bat', 'eza', 'fzf', 'delta', 'htop',
     'docker', 'kubectl', 'git', 'curl', 'wget', 'python3', 'pip3',
@@ -189,7 +189,7 @@ export function getSystemToolsSummary() {
     parts.push('Available tools: ' + available.join(', '));
   }
 
-  // Python 包（快速扫描）
+  // Python packages (quick scan)
   try {
     const pipList = execSync('pip3 list --format=columns 2>/dev/null | tail -n +3 | head -20', {
       encoding: 'utf-8',

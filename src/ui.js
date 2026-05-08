@@ -38,9 +38,9 @@ export function printInstallSuggestion(cmd, suggestions) {
 }
 
 /**
- * 流式输出渲染器。
+ * Streaming output renderer.
  * @param {string} mode - 'command' | 'chat'
- * 返回一个对象 { onThinking, onContent, onDone, getResult }
+ * Returns an object { onThinking, onContent, onDone, getResult }
  */
 export function createStreamRenderer(mode = 'command') {
   let thinkingStarted = false;
@@ -95,8 +95,8 @@ export function createStreamRenderer(mode = 'command') {
 }
 
 /**
- * 获取用于交互的输入流。
- * 当 stdin 是管道时，从 /dev/tty 读取用户输入。
+ * Get input stream for interactive use.
+ * When stdin is a pipe, reads user input from /dev/tty.
  */
 function getTTYInput() {
   if (process.stdin.isTTY) return process.stdin;
@@ -109,8 +109,8 @@ function getTTYInput() {
 }
 
 /**
- * 询问用户是否执行命令。
- * 返回 'run' | 'save' | 'edit' | 'cancel'
+ * Ask the user whether to execute the command.
+ * Returns 'run' | 'save' | 'edit' | 'cancel'
  */
 export function confirmRun() {
   return new Promise((resolve) => {
@@ -129,7 +129,7 @@ export function confirmRun() {
 }
 
 /**
- * 让用户编辑命令。
+ * Let the user edit the command.
  */
 export function editCommand(cmd) {
   return new Promise((resolve) => {

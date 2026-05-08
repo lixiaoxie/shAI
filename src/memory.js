@@ -5,7 +5,7 @@ import os from 'node:os';
 const MEMORY_FILE = path.join(os.homedir(), '.shai', 'memory.json');
 
 /**
- * 记忆条目格式：
+ * Memory entry format:
  * { id, query, command, tags, note, createdAt, usageCount }
  */
 
@@ -29,7 +29,7 @@ export function clearAllMemory() {
 }
 
 /**
- * 保存一条记忆（用户主动保存或执行后自动记录）。
+ * Save a memory entry (user-initiated or auto-saved after execution).
  */
 export function saveMemory({ query, command, tags = [], note = '' }) {
   const entries = loadMemory();
@@ -48,7 +48,7 @@ export function saveMemory({ query, command, tags = [], note = '' }) {
 }
 
 /**
- * 增加使用次数。
+ * Increment usage count.
  */
 export function bumpUsage(id) {
   const entries = loadMemory();
@@ -60,7 +60,7 @@ export function bumpUsage(id) {
 }
 
 /**
- * 删除记忆。
+ * Delete a memory entry.
  */
 export function removeMemory(idOrIndex) {
   const entries = loadMemory();
@@ -68,7 +68,7 @@ export function removeMemory(idOrIndex) {
   if (isNaN(idx)) {
     idx = entries.findIndex((e) => e.id === idOrIndex);
   } else {
-    idx -= 1; // 用户输入从 1 开始
+    idx -= 1; // User input is 1-based
   }
   if (idx < 0 || idx >= entries.length) return false;
   entries.splice(idx, 1);
@@ -77,7 +77,7 @@ export function removeMemory(idOrIndex) {
 }
 
 /**
- * 搜索记忆（简单关键词匹配）。
+ * Search memory entries (simple keyword matching).
  */
 export function searchMemory(keyword) {
   const entries = loadMemory();
@@ -93,14 +93,14 @@ export function searchMemory(keyword) {
 }
 
 /**
- * 获取记忆摘要（传给 AI 作为上下文）。
- * 优先返回使用频率高和最近使用的条目。
+ * Get memory summary (context for AI).
+ * Prioritizes frequently used and recently created entries.
  */
 export function getMemorySummary(maxEntries = 15) {
   const entries = loadMemory();
   if (entries.length === 0) return null;
 
-  // 按使用次数降序，再按创建时间降序
+  // Sort by usage count descending, then by creation time descending
   const sorted = [...entries].sort((a, b) => {
     if (b.usageCount !== a.usageCount) return b.usageCount - a.usageCount;
     return b.createdAt.localeCompare(a.createdAt);
