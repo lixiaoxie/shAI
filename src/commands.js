@@ -1,4 +1,4 @@
-import { execSync } from 'node:child_process';
+import { execSync, exec } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
@@ -218,45 +218,38 @@ function saveToolsCache(cache) {
 }
 
 /**
- * Learn help text for a tool (truncated to 20 lines for cache efficiency).
+ * Run a shell command asynchronously, returning stdout or null on failure.
  */
-function learnToolHelp(cmd) {
-  const attempts = [`${cmd} --help`, `${cmd} -h`];
-  for (const attempt of attempts) {
-    try {
-      const output = execSync(attempt, {
-        encoding: 'utf-8',
-        timeout: 3000,
-        stdio: ['pipe', 'pipe', 'pipe'],
-        shell: process.env.SHELL || true,
-      });
-      const text = output.trim();
-      if (text.length > 20) {
-        return text.split('\n').slice(0, 20).join('\n');
-      }
-    } catch {
-      try {
-        const output = execSync(`${attempt} 2>&1`, {
-          encoding: 'utf-8',
-          timeout: 3000,
-          stdio: ['pipe', 'pipe', 'pipe'],
-          shell: process.env.SHELL || true,
-        });
-        const text = output.trim();
-        if (text.length > 20) {
-          return text.split('\n').slice(0, 20).join('\n');
-        }
-      } catch { /* ignore */ }
-    }
+function execAsync(cmd, timeout = 2000) {
+  return new Promise((resolve) => {
+    exec(cmd, {
+      encoding: 'utf-8',
+      timeout,
+      shell: process.env.SHELL || true,
+    }, (err, stdout, stderr) => {
+      const text = (stdout || stderr || '').trim();
+      resolve(text.length > 20 ? text : null);
+    });
+  });
+}
+
+/**
+ * Learn help text for a tool asynchronously (truncated to 20 lines).
+ */
+async function learnToolHelpAsync(cmd) {
+  // Try --help first, then -h
+  for (const flag of ['--help', '-h']) {
+    const text = await execAsync(`${cmd} ${flag} 2>&1`, 2000);
+    if (text) return text.split('\n').slice(0, 20).join('\n');
   }
   return null;
 }
 
 /**
  * Scan system tools and update cache if PATH has changed.
- * Returns cached data if PATH executable count is unchanged.
+ * Runs help learning in parallel for speed.
  */
-function refreshToolsCache() {
+async function refreshToolsCache() {
   const currentCount = countPathExecutables();
   const cache = loadToolsCache();
 
@@ -265,53 +258,36 @@ function refreshToolsCache() {
   }
 
   // PATH changed or no cache — re-scan
+  // Step 1: Check which tools exist (fast, sequential execSync)
+  const existingTools = KNOWN_TOOLS.filter(commandExists);
+
+  // Step 2: Learn help for new tools in parallel
+  const helpPromises = existingTools.map(async (cmd) => {
+    const cachedHelp = cache?.tools?.[cmd]?.help || null;
+    const help = cachedHelp || await learnToolHelpAsync(cmd);
+    return { cmd, help };
+  });
+  const helpResults = await Promise.all(helpPromises);
+
   const tools = {};
-  for (const cmd of KNOWN_TOOLS) {
-    const exists = commandExists(cmd);
-    if (exists) {
-      // Reuse cached help if tool was already known
-      const cachedHelp = cache?.tools?.[cmd]?.help || null;
-      const help = cachedHelp || learnToolHelp(cmd);
-      tools[cmd] = { exists: true, help };
-    }
+  for (const { cmd, help } of helpResults) {
+    tools[cmd] = { exists: true, help };
   }
 
-  // Python packages
-  let pythonPackages = [];
-  try {
-    const pipList = execSync('pip3 list --format=columns 2>/dev/null | tail -n +3 | head -30', {
-      encoding: 'utf-8',
-      timeout: 3000,
-      stdio: ['pipe', 'pipe', 'pipe'],
-    });
-    pythonPackages = pipList.split('\n').map((l) => l.split(/\s+/)[0]).filter(Boolean);
-  } catch { /* ignore */ }
-
-  // npm global packages
-  let npmPackages = [];
-  try {
-    const npmList = execSync('npm ls -g --depth=0 --parseable 2>/dev/null | tail -n +2', {
-      encoding: 'utf-8',
-      timeout: 5000,
-      stdio: ['pipe', 'pipe', 'pipe'],
-    });
-    npmPackages = npmList.split('\n')
-      .map((l) => l.trim().split('/').pop())
-      .filter(Boolean);
-  } catch { /* ignore */ }
-
-  // Homebrew packages (macOS only)
-  let brewPackages = [];
-  if (process.platform === 'darwin') {
-    try {
-      const brewList = execSync('brew list --formula -1 2>/dev/null | head -50', {
-        encoding: 'utf-8',
-        timeout: 5000,
-        stdio: ['pipe', 'pipe', 'pipe'],
-      });
-      brewPackages = brewList.split('\n').filter(Boolean);
-    } catch { /* ignore */ }
-  }
+  // Step 3: Scan package managers in parallel
+  const [pythonPackages, npmPackages, brewPackages] = await Promise.all([
+    // Python packages
+    execAsync('pip3 list --format=columns 2>/dev/null | tail -n +3 | head -30', 3000)
+      .then((text) => text ? text.split('\n').map((l) => l.split(/\s+/)[0]).filter(Boolean) : []),
+    // npm global packages
+    execAsync('npm ls -g --depth=0 --parseable 2>/dev/null | tail -n +2', 5000)
+      .then((text) => text ? text.split('\n').map((l) => l.trim().split('/').pop()).filter(Boolean) : []),
+    // Homebrew packages (macOS only)
+    process.platform === 'darwin'
+      ? execAsync('brew list --formula -1 2>/dev/null | head -50', 5000)
+          .then((text) => text ? text.split('\n').filter(Boolean) : [])
+      : Promise.resolve([]),
+  ]);
 
   const newCache = {
     pathCommandCount: currentCount,
@@ -330,7 +306,7 @@ function refreshToolsCache() {
  * Get a summary of available system tools (context for AI).
  * Uses cached data with automatic refresh when PATH changes.
  */
-export function getSystemToolsSummary() {
+export async function getSystemToolsSummary() {
   const parts = [];
 
   // Custom commands
@@ -346,7 +322,7 @@ export function getSystemToolsSummary() {
   }
 
   // Cached system tools
-  const cache = refreshToolsCache();
+  const cache = await refreshToolsCache();
   const availableTools = Object.keys(cache.tools);
   if (availableTools.length > 0) {
     const toolLines = availableTools.map((cmd) => {

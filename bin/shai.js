@@ -117,7 +117,7 @@ async function main() {
     const ctx = pipeInput
       ? `Piped input (output from previous command):\n\`\`\`\n${pipeInput.slice(0, 4000)}\n\`\`\``
       : getTerminalContext();
-    const toolsSummary = getSystemToolsSummary();
+    const toolsSummary = await getSystemToolsSummary();
 
     printThinking();
     await streamChat(config, chatQuery, ctx, toolsSummary);
@@ -160,7 +160,7 @@ async function main() {
 
   // Get terminal context (skipped with --no-context; not read when pipe input is present)
   const ctx = noContext || pipeInput ? null : getTerminalContext();
-  const toolsSummary = getSystemToolsSummary();
+  const toolsSummary = await getSystemToolsSummary();
   const memorySummary = getMemorySummary();
 
   // Merge tools summary and memory
