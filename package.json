@@ -4,7 +4,7 @@
   "description": "AI-powered shell command assistant — describe what you want in natural language, get the right command.",
   "type": "module",
   "bin": {
-    "shai": "./bin/shai.js"
+    "shai": "bin/shai.js"
   },
   "files": [
     "bin/",
@@ -15,7 +15,17 @@
   "scripts": {
     "test": "node --test test/*.test.js"
   },
-  "keywords": ["cli", "ai", "shell", "assistant", "openai", "command-line", "natural-language", "chatgpt", "deepseek"],
+  "keywords": [
+    "cli",
+    "ai",
+    "shell",
+    "assistant",
+    "openai",
+    "command-line",
+    "natural-language",
+    "chatgpt",
+    "deepseek"
+  ],
   "author": "luke.li",
   "license": "MIT",
   "repository": {
