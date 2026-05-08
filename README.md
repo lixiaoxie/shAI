@@ -12,14 +12,23 @@
 
 ## English
 
+### Install
+
+```bash
+# From npm (recommended)
+npm install -g shai-cli
+
+# From GitHub Packages
+npm install -g @lixiaoxie/shai-cli --registry=https://npm.pkg.github.com
+
+# From source
+git clone https://github.com/lixiaoxie/shAI.git
+cd shAI && npm link
+```
+
 ### Quick Start
 
 ```bash
-# Install globally
-npm install -g .
-# Or via npm link (for development)
-npm link
-
 # First run will guide you through API configuration
 shai find all files larger than 100M
 ```
@@ -102,12 +111,23 @@ Compatible with any OpenAI-compatible API (Ollama, DeepSeek, Qwen, etc.).
 
 ## 中文说明
 
+### 安装
+
+```bash
+# 从 npm 安装（推荐）
+npm install -g shai-cli
+
+# 从 GitHub Packages 安装
+npm install -g @lixiaoxie/shai-cli --registry=https://npm.pkg.github.com
+
+# 从源码安装
+git clone https://github.com/lixiaoxie/shAI.git
+cd shAI && npm link
+```
+
 ### 快速开始
 
 ```bash
-# 全局安装
-npm install -g .
-
 # 首次运行会引导配置 API
 shai 查找当前目录下所有大于100M的文件
 ```
