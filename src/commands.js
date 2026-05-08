@@ -5,6 +5,17 @@ import os from 'node:os';
 
 const CUSTOM_COMMANDS_FILE = path.join(os.homedir(), '.shai', 'commands.json');
 const TOOLS_CACHE_FILE = path.join(os.homedir(), '.shai', 'tools-cache.json');
+const BIN_PATHS_FILE = path.join(os.homedir(), '.shai', 'bin-paths.json');
+
+// Common bin directories that may not be in PATH
+const EXTRA_BIN_DIRS = [
+  path.join(os.homedir(), '.local', 'bin'),
+  path.join(os.homedir(), 'bin'),
+  path.join(os.homedir(), '.cargo', 'bin'),
+  path.join(os.homedir(), 'go', 'bin'),
+  '/usr/local/bin',
+  '/opt/homebrew/bin',
+];
 
 // Curated list of common CLI tools worth tracking
 const KNOWN_TOOLS = [
@@ -182,12 +193,83 @@ export function getInstallSuggestion(cmd) {
 }
 
 /**
- * Count total executable files across all PATH directories.
+ * Load user-defined custom bin paths.
+ */
+export function loadBinPaths() {
+  try {
+    if (!fs.existsSync(BIN_PATHS_FILE)) return [];
+    const data = JSON.parse(fs.readFileSync(BIN_PATHS_FILE, 'utf-8'));
+    return Array.isArray(data) ? data : [];
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Save user-defined custom bin paths.
+ */
+export function saveBinPaths(paths) {
+  const dir = path.dirname(BIN_PATHS_FILE);
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(BIN_PATHS_FILE, JSON.stringify(paths, null, 2) + '\n', 'utf-8');
+}
+
+/**
+ * Add a custom bin path. Returns { ok, message }.
+ */
+export function addBinPath(dirPath) {
+  const resolved = path.resolve(dirPath.replace(/^~/, os.homedir()));
+  if (!fs.existsSync(resolved)) {
+    return { ok: false, message: `Path does not exist: ${resolved}` };
+  }
+  const stat = fs.statSync(resolved);
+  if (!stat.isDirectory()) {
+    return { ok: false, message: `Not a directory: ${resolved}` };
+  }
+  const paths = loadBinPaths();
+  if (paths.includes(resolved)) {
+    return { ok: false, message: `Already added: ${resolved}` };
+  }
+  paths.push(resolved);
+  saveBinPaths(paths);
+  // Invalidate cache to trigger re-scan
+  try { fs.unlinkSync(TOOLS_CACHE_FILE); } catch { /* ignore */ }
+  return { ok: true, message: `Added: ${resolved}` };
+}
+
+/**
+ * Remove a custom bin path. Returns { ok, message }.
+ */
+export function removeBinPath(dirPath) {
+  const resolved = path.resolve(dirPath.replace(/^~/, os.homedir()));
+  const paths = loadBinPaths();
+  const idx = paths.indexOf(resolved);
+  if (idx === -1) {
+    return { ok: false, message: `Not found: ${resolved}` };
+  }
+  paths.splice(idx, 1);
+  saveBinPaths(paths);
+  try { fs.unlinkSync(TOOLS_CACHE_FILE); } catch { /* ignore */ }
+  return { ok: true, message: `Removed: ${resolved}` };
+}
+
+/**
+ * Get all bin directories to scan: PATH + common extras + user-defined.
+ */
+function getAllBinDirs() {
+  const pathDirs = (process.env.PATH || '').split(':').filter(Boolean);
+  const userPaths = loadBinPaths();
+  const allDirs = new Set([...pathDirs, ...EXTRA_BIN_DIRS, ...userPaths]);
+  return [...allDirs];
+}
+
+/**
+ * Count total executable files across all bin directories.
  */
 function countPathExecutables() {
-  const pathDirs = (process.env.PATH || '').split(':').filter(Boolean);
+  const dirs = getAllBinDirs();
   let count = 0;
-  for (const dir of pathDirs) {
+  for (const dir of dirs) {
     try {
       const entries = fs.readdirSync(dir);
       count += entries.length;

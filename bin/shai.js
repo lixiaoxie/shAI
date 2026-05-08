@@ -13,7 +13,7 @@ import {
 import {
   extractCommands, commandExists, getInstallSuggestion,
   getSystemToolsSummary, loadCustomCommands, saveCustomCommands,
-  learnCommand,
+  learnCommand, addBinPath, removeBinPath, loadBinPaths,
 } from '../src/commands.js';
 import {
   loadMemory, saveMemory, removeMemory, searchMemory, getMemorySummary, clearAllMemory,
@@ -133,6 +133,12 @@ async function main() {
   // Subcommand: mem (memory management)
   if (args[0] === 'mem') {
     handleMemSubcommand(args.slice(1));
+    process.exit(0);
+  }
+
+  // Subcommand: path (custom bin path management)
+  if (args[0] === 'path') {
+    handlePathSubcommand(args.slice(1));
     process.exit(0);
   }
 
@@ -442,6 +448,48 @@ function handleMemSubcommand(args) {
   }
 
   console.error(`${t('uiUnknownSub')} list, search, save, rm, clear`);
+}
+
+function handlePathSubcommand(args) {
+  const sub = args[0];
+
+  if (sub === 'add') {
+    const dirPath = args.slice(1).join(' ');
+    if (!dirPath) {
+      console.error(t('pathAddUsage'));
+      return;
+    }
+    const result = addBinPath(dirPath);
+    console.error(result.ok ? `✅ ${result.message}` : `❌ ${result.message}`);
+    return;
+  }
+
+  if (sub === 'rm' || sub === 'remove') {
+    const dirPath = args.slice(1).join(' ');
+    if (!dirPath) {
+      console.error(t('pathRmUsage'));
+      return;
+    }
+    const result = removeBinPath(dirPath);
+    console.error(result.ok ? `✅ ${result.message}` : `❌ ${result.message}`);
+    return;
+  }
+
+  if (sub === 'list' || !sub) {
+    const paths = loadBinPaths();
+    if (paths.length === 0) {
+      console.error(t('pathEmpty'));
+    } else {
+      console.error(t('pathListTitle'));
+      paths.forEach((p, i) => {
+        const exists = fs.existsSync(p);
+        console.error(`  ${i + 1}. ${p} ${exists ? '✅' : '❌ (not found)'}`);
+      });
+    }
+    return;
+  }
+
+  console.error(`${t('uiUnknownSub')} add, rm, list`);
 }
 
 main().catch((e) => {

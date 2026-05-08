@@ -13,6 +13,9 @@ const messages = {
     helpMemSaveDesc: '手动保存命令到记忆',
     helpMemRmDesc: '删除指定记忆',
     helpMemClearDesc: '清空所有记忆',
+    helpPathAddDesc: '添加自定义 bin 目录',
+    helpPathRmDesc: '移除自定义 bin 目录',
+    helpPathListDesc: '列出自定义 bin 目录',
     helpOptions: '选项：',
     helpOptHelp: '显示帮助信息',
     helpOptVersion: '显示版本号',
@@ -93,6 +96,12 @@ const messages = {
     memCleared: '✅ 已清空 {n} 条记忆。',
     memIsEmpty: '记忆为空。',
 
+    // Path
+    pathAddUsage: '用法：shai path add <目录路径>',
+    pathRmUsage: '用法：shai path rm <目录路径>',
+    pathEmpty: '暂无自定义 bin 路径。使用 shai path add <目录路径> 添加。',
+    pathListTitle: '自定义 bin 路径：',
+
     // Chat
     chatUsage: '用法：shai chat <问题>',
     chatExample: '示例：shai chat git rebase 和 merge 有什么区别',
@@ -111,6 +120,9 @@ const messages = {
     helpMemSaveDesc: 'Manually save a command to memory',
     helpMemRmDesc: 'Delete a specific memory',
     helpMemClearDesc: 'Clear all memories',
+    helpPathAddDesc: 'Add custom bin directory',
+    helpPathRmDesc: 'Remove custom bin directory',
+    helpPathListDesc: 'List custom bin directories',
     helpOptions: 'Options:',
     helpOptHelp: 'Show help',
     helpOptVersion: 'Show version',
@@ -188,6 +200,12 @@ const messages = {
     memCleared: '✅ Cleared {n} memories.',
     memIsEmpty: 'Memory is empty.',
 
+    // Path
+    pathAddUsage: 'Usage: shai path add <directory>',
+    pathRmUsage: 'Usage: shai path rm <directory>',
+    pathEmpty: 'No custom bin paths. Use shai path add <directory> to add one.',
+    pathListTitle: 'Custom bin paths:',
+
     chatUsage: 'Usage: shai chat <question>',
     chatExample: 'Example: shai chat what is the difference between git rebase and merge',
   },
@@ -230,6 +248,9 @@ ${t('helpUsage')}
   shai mem save <${L === 'zh' ? '描述' : 'desc'}> <${L === 'zh' ? '命令' : 'cmd'}>   ${t('helpMemSaveDesc')}
   shai mem rm <${L === 'zh' ? '编号' : 'id'}>            ${t('helpMemRmDesc')}
   shai mem clear              ${t('helpMemClearDesc')}
+  shai path add <${L === 'zh' ? '目录' : 'dir'}>        ${t('helpPathAddDesc')}
+  shai path rm <${L === 'zh' ? '目录' : 'dir'}>         ${t('helpPathRmDesc')}
+  shai path list              ${t('helpPathListDesc')}
 
 ${t('helpOptions')}
   -h, --help                  ${t('helpOptHelp')}
