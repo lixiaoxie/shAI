@@ -6,10 +6,24 @@
   "bin": {
     "shai": "./bin/shai.js"
   },
+  "files": [
+    "bin/",
+    "src/",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "test": "node --test test/*.test.js"
   },
-  "keywords": ["cli", "ai", "shell", "assistant", "openai"],
-  "author": "",
-  "license": "MIT"
+  "keywords": ["cli", "ai", "shell", "assistant", "openai", "command-line", "natural-language", "chatgpt", "deepseek"],
+  "author": "luke.li",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lixiaoxie/shAI.git"
+  },
+  "homepage": "https://github.com/lixiaoxie/shAI#readme",
+  "engines": {
+    "node": ">=18"
+  }
 }
