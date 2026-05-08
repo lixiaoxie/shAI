@@ -287,10 +287,38 @@ function refreshToolsCache() {
     pythonPackages = pipList.split('\n').map((l) => l.split(/\s+/)[0]).filter(Boolean);
   } catch { /* ignore */ }
 
+  // npm global packages
+  let npmPackages = [];
+  try {
+    const npmList = execSync('npm ls -g --depth=0 --parseable 2>/dev/null | tail -n +2', {
+      encoding: 'utf-8',
+      timeout: 5000,
+      stdio: ['pipe', 'pipe', 'pipe'],
+    });
+    npmPackages = npmList.split('\n')
+      .map((l) => l.trim().split('/').pop())
+      .filter(Boolean);
+  } catch { /* ignore */ }
+
+  // Homebrew packages (macOS only)
+  let brewPackages = [];
+  if (process.platform === 'darwin') {
+    try {
+      const brewList = execSync('brew list --formula -1 2>/dev/null | head -50', {
+        encoding: 'utf-8',
+        timeout: 5000,
+        stdio: ['pipe', 'pipe', 'pipe'],
+      });
+      brewPackages = brewList.split('\n').filter(Boolean);
+    } catch { /* ignore */ }
+  }
+
   const newCache = {
     pathCommandCount: currentCount,
     tools,
     pythonPackages,
+    npmPackages,
+    brewPackages,
     lastScan: new Date().toISOString(),
   };
 
@@ -332,6 +360,16 @@ export function getSystemToolsSummary() {
   // Python packages
   if (cache.pythonPackages?.length > 0) {
     parts.push('Python packages: ' + cache.pythonPackages.join(', '));
+  }
+
+  // npm global packages
+  if (cache.npmPackages?.length > 0) {
+    parts.push('npm global packages: ' + cache.npmPackages.join(', '));
+  }
+
+  // Homebrew packages
+  if (cache.brewPackages?.length > 0) {
+    parts.push('Homebrew packages: ' + cache.brewPackages.join(', '));
   }
 
   return parts.join('\n');
