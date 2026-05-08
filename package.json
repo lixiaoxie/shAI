@@ -7,7 +7,7 @@
     "shai": "./bin/shai.js"
   },
   "scripts": {
-    "test": "node --test test/"
+    "test": "node --test test/*.test.js"
   },
   "keywords": ["cli", "ai", "shell", "assistant", "openai"],
   "author": "",
