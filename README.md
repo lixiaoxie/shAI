@@ -3,8 +3,10 @@
 [![npm version](https://img.shields.io/npm/v/shai-cli.svg)](https://www.npmjs.com/package/shai-cli)
 [![CI](https://github.com/lixiaoxie/shAI/actions/workflows/ci.yml/badge.svg)](https://github.com/lixiaoxie/shAI/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Zero Dependencies](https://img.shields.io/badge/dependencies-0-brightgreen.svg)]()
+[![Node.js](https://img.shields.io/badge/node-%E2%89%A518-blue.svg)]()
 
-**AI-powered shell command assistant** — describe what you want in natural language, get the right command.
+**Lightweight AI shell command assistant** — describe what you want in natural language, get the right command. Zero dependencies, ~600 lines of code, pure Node.js.
 
 [中文](#中文说明) | [English](#english)
 
@@ -37,6 +39,7 @@ shai find all files larger than 100M
 
 - **Natural language → shell commands** — just describe what you want
 - **Streaming output** — real-time display of AI thinking process (supports reasoning models)
+- **History learning** — learns from your shell history to match your command habits
 - **Chat mode** — `shai chat` for general Q&A without command generation
 - **Pipe support** — `some_cmd 2>&1 | shai chat what does this error mean`
 - **Command validation** — checks if generated commands exist on your system
@@ -44,8 +47,9 @@ shai find all files larger than 100M
 - **Custom commands** — register your own scripts/tools for AI to use
 - **Memory system** — auto-saves complex commands, learns your preferences
 - **Terminal context** — reads tmux pane / shell history for context-aware responses
+- **Provider presets** — 11 built-in AI providers (OpenAI, DeepSeek, Qwen, Ollama, etc.)
 - **i18n** — supports English and Chinese (`--set-lang en|zh`)
-- **Zero dependencies** — pure Node.js, no npm packages required
+- **Zero dependencies** — pure Node.js built-in modules only, ~600 lines of code
 
 ### Usage
 
@@ -105,7 +109,8 @@ Compatible with any OpenAI-compatible API (Ollama, DeepSeek, Qwen, etc.).
 ### Requirements
 
 - Node.js ≥ 18
-- Zero npm dependencies
+- **Zero npm dependencies** — uses only Node.js built-in modules
+- Works with any OpenAI-compatible API
 
 ---
 
@@ -136,6 +141,7 @@ shai 查找当前目录下所有大于100M的文件
 
 - **自然语言 → Shell 命令** — 描述你想做的事，自动生成命令
 - **流式输出** — 实时显示 AI 思考过程（支持 DeepSeek 等推理模型）
+- **历史学习** — 从 shell 历史中学习你的命令习惯，提高匹配精度
 - **问答模式** — `shai chat` 通用问答，不生成命令
 - **管道支持** — `some_cmd 2>&1 | shai chat 这个报错什么意思`
 - **命令验证** — 自动检查生成的命令是否存在
@@ -143,8 +149,9 @@ shai 查找当前目录下所有大于100M的文件
 - **自定义命令** — 注册自定义脚本，AI 会自动学习用法
 - **记忆系统** — 自动保存复杂命令，学习你的使用偏好
 - **终端上下文** — 读取 tmux / shell history 提供上下文感知
+- **服务商预设** — 内置 11 个 AI 服务商（OpenAI、DeepSeek、通义、Ollama 等）
 - **中英双语** — `--set-lang zh|en` 切换语言
-- **零依赖** — 纯 Node.js 实现
+- **零依赖** — 纯 Node.js 内置模块，~600 行代码
 
 ### 使用示例
 
