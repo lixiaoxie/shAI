@@ -41,7 +41,7 @@ function readPipeInput() {
   });
 }
 
-const VERSION = '1.0.1';
+const VERSION = '1.0.2';
 
 // Mask a URL to hide the hostname, keeping only protocol and path.
 function maskUrl(url) {
