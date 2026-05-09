@@ -6,6 +6,7 @@ const messages = {
     helpDesc: '生成并执行 shell 命令',
     helpChatDesc: '通用问答模式（不生成命令）',
     helpConfigDesc: '交互式重新配置 API 设置',
+    helpConfigShowDesc: '显示当前配置（密钥/URL 已脱敏）',
     helpCmdAddDesc: '添加自定义命令/脚本到 AI 上下文',
     helpCmdRmDesc: '移除自定义命令',
     helpCmdListDesc: '列出所有自定义命令',
@@ -113,6 +114,7 @@ const messages = {
     helpDesc: 'Generate and execute shell commands',
     helpChatDesc: 'General Q&A mode (no command generation)',
     helpConfigDesc: 'Interactive API configuration',
+    helpConfigShowDesc: 'Show current configuration (masked)',
     helpCmdAddDesc: 'Add custom command/script to AI context',
     helpCmdRmDesc: 'Remove custom command',
     helpCmdListDesc: 'List all custom commands',
@@ -241,6 +243,7 @@ ${t('helpUsage')}
   shai <${L === 'zh' ? '自然语言描述' : 'natural language'}>          ${t('helpDesc')}
   shai chat <${L === 'zh' ? '问题' : 'question'}>            ${t('helpChatDesc')}
   shai config                 ${t('helpConfigDesc')}
+  shai config show            ${t('helpConfigShowDesc')}
   shai cmd add <${L === 'zh' ? '名称' : 'name'}> <${L === 'zh' ? '说明' : 'desc'}>  ${t('helpCmdAddDesc')}
   shai cmd rm <${L === 'zh' ? '名称' : 'name'}>          ${t('helpCmdRmDesc')}
   shai cmd list               ${t('helpCmdListDesc')}

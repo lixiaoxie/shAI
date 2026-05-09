@@ -23,6 +23,7 @@ const SYSTEM_PROMPT = `You are shAI, a command-line assistant. The user describe
   shai --set-key <key>        Set API key
   shai --set-model <model>    Set model
   shai config                 Interactive configuration
+  shai config show            Show current configuration (masked)
   shai cmd add <name> <desc>  Add custom command
   shai cmd rm <name>          Remove custom command
   shai cmd list               List custom commands

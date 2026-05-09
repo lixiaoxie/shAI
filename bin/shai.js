@@ -113,6 +113,21 @@ async function main() {
 
   // Subcommand: config
   if (args[0] === 'config') {
+    if (args[1] === 'show') {
+      const cfg = loadConfig();
+      if (!cfg) {
+        console.error(t('configNotFound'));
+      } else {
+        const masked = {
+          ...cfg,
+          api_url: cfg.api_url ? maskUrl(cfg.api_url) : t('configNotSet'),
+          api_key: cfg.api_key ? '****' + cfg.api_key.slice(-4) : t('configNotSet'),
+        };
+        console.error(`${t('configFile')}: ${CONFIG_FILE}\n`);
+        console.error(JSON.stringify(masked, null, 2));
+      }
+      process.exit(0);
+    }
     await setupInteractive();
     process.exit(0);
   }
