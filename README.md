@@ -6,7 +6,7 @@
 [![Zero Dependencies](https://img.shields.io/badge/dependencies-0-brightgreen.svg)]()
 [![Node.js](https://img.shields.io/badge/node-%E2%89%A518-blue.svg)]()
 
-**Lightweight AI shell command assistant** — describe what you want in natural language, get the right command. Zero dependencies, ~600 lines of code, pure Node.js.
+**Lightweight AI shell command assistant** — describe what you want in natural language, get the right command. Zero dependencies, pure Node.js.
 
 [中文](#中文说明) | [English](#english)
 
@@ -49,7 +49,7 @@ shai find all files larger than 100M
 - **Terminal context** — reads tmux pane / shell history for context-aware responses
 - **Provider presets** — 11 built-in AI providers (OpenAI, DeepSeek, Qwen, Ollama, etc.)
 - **i18n** — supports English and Chinese (`--set-lang en|zh`)
-- **Zero dependencies** — pure Node.js built-in modules only, ~600 lines of code
+- **Zero dependencies** — pure Node.js built-in modules only
 
 ### Usage
 
@@ -151,7 +151,7 @@ shai 查找当前目录下所有大于100M的文件
 - **终端上下文** — 读取 tmux / shell history 提供上下文感知
 - **服务商预设** — 内置 11 个 AI 服务商（OpenAI、DeepSeek、通义、Ollama 等）
 - **中英双语** — `--set-lang zh|en` 切换语言
-- **零依赖** — 纯 Node.js 内置模块，~600 行代码
+- **零依赖** — 纯 Node.js 内置模块
 
 ### 使用示例
 
