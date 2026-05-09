@@ -57,6 +57,9 @@ const messages = {
     configNotFound: '未找到配置。运行 shai config 进行初始配置。',
     configFile: '配置文件',
     configUpdated: '已更新为',
+    configSelectProvider: '📋 选择 AI 服务商（或输入 0 自定义）：',
+    configCustomProvider: '自定义 URL',
+    configProviderPrompt: '请选择',
     firstTimeConfig: '首次使用，请先配置 API：',
 
     // UI
@@ -164,6 +167,9 @@ const messages = {
     configNotFound: 'No configuration found. Run shai config to set up.',
     configFile: 'Config file',
     configUpdated: 'updated to',
+    configSelectProvider: '📋 Select AI provider (or enter 0 for custom):',
+    configCustomProvider: 'Custom URL',
+    configProviderPrompt: 'Select',
     firstTimeConfig: 'First time use, please configure API:',
 
     uiThinking: '⏳ Thinking...',

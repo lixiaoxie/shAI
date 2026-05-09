@@ -14,6 +14,19 @@ const DEFAULT_CONFIG = {
   lang: 'en',
 };
 
+// Preset AI providers with OpenAI-compatible endpoints
+const PROVIDERS = [
+  { name: 'OpenAI',       url: 'https://api.openai.com/v1/chat/completions',                         model: 'gpt-4o-mini' },
+  { name: 'DeepSeek',     url: 'https://api.deepseek.com/v1/chat/completions',                       model: 'deepseek-chat' },
+  { name: 'Qwen (阿里通义)', url: 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions', model: 'qwen-max' },
+  { name: 'Zhipu (智谱GLM)', url: 'https://open.bigmodel.cn/api/paas/v4/chat/completions',             model: 'glm-4' },
+  { name: 'Moonshot (Kimi)', url: 'https://api.moonshot.cn/v1/chat/completions',                       model: 'moonshot-v1-8k' },
+  { name: 'Groq',         url: 'https://api.groq.com/openai/v1/chat/completions',                    model: 'llama-3.3-70b-versatile' },
+  { name: 'Together AI',  url: 'https://api.together.xyz/v1/chat/completions',                       model: 'meta-llama/Llama-3-70b-chat-hf' },
+  { name: 'Mistral',      url: 'https://api.mistral.ai/v1/chat/completions',                         model: 'mistral-large-latest' },
+  { name: 'Ollama (本地)',  url: 'http://localhost:11434/v1/chat/completions',                          model: 'llama3' },
+];
+
 export function loadConfig() {
   if (!fs.existsSync(CONFIG_FILE)) return null;
   try {
@@ -40,11 +53,32 @@ export async function setupInteractive() {
 
   console.error(`\n${t('configTitle')}\n`);
 
-  const maskedUrl = existing.api_url ? maskConfigUrl(existing.api_url) : t('configNotSet');
+  // Show provider list
+  console.error(t('configSelectProvider'));
+  PROVIDERS.forEach((p, i) => {
+    console.error(`  ${i + 1}. ${p.name}  (${p.model})`);
+  });
+  console.error(`  0. ${t('configCustomProvider')}\n`);
+
+  const choice = await ask(rl, `${t('configProviderPrompt')} [0]: `, '0');
+  const idx = parseInt(choice, 10);
+
+  let api_url, model;
+  if (idx >= 1 && idx <= PROVIDERS.length) {
+    const provider = PROVIDERS[idx - 1];
+    api_url = provider.url;
+    model = provider.model;
+    console.error(`\n✅ ${provider.name}: ${api_url}`);
+    const customModel = await ask(rl, `${t('configModel')} [${model}]: `, model);
+    model = customModel;
+  } else {
+    const maskedUrl = existing.api_url ? maskConfigUrl(existing.api_url) : t('configNotSet');
+    api_url = await ask(rl, `${t('configApiUrl')} [${maskedUrl}]: `, existing.api_url);
+    model = await ask(rl, `${t('configModel')} [${existing.model}]: `, existing.model);
+  }
+
   const maskedKey = existing.api_key ? '****' + existing.api_key.slice(-4) : t('configNotSet');
-  const api_url = await ask(rl, `${t('configApiUrl')} [${maskedUrl}]: `, existing.api_url);
   const api_key = await ask(rl, `${t('configApiKey')} [${maskedKey}]: `, existing.api_key);
-  const model = await ask(rl, `${t('configModel')} [${existing.model}]: `, existing.model);
   const lang = await ask(rl, `${t('configLang')} (zh/en) [${existing.lang}]: `, existing.lang);
 
   rl.close();
