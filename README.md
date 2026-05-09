@@ -1,4 +1,4 @@
-# shAI
+# shAI CLI
 
 [![npm version](https://img.shields.io/npm/v/shai-cli.svg)](https://www.npmjs.com/package/shai-cli)
 [![CI](https://github.com/lixiaoxie/shAI/actions/workflows/ci.yml/badge.svg)](https://github.com/lixiaoxie/shAI/actions)
