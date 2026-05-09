@@ -21,6 +21,8 @@ const PROVIDERS = [
   { name: 'Qwen (阿里通义)', url: 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions', model: 'qwen-max' },
   { name: 'Zhipu (智谱GLM)', url: 'https://open.bigmodel.cn/api/paas/v4/chat/completions',             model: 'glm-4' },
   { name: 'Moonshot (Kimi)', url: 'https://api.moonshot.cn/v1/chat/completions',                       model: 'moonshot-v1-8k' },
+  { name: 'MiniMax',      url: 'https://api.minimax.chat/v1/chat/completions',                       model: 'abab5.5-chat' },
+  { name: 'MiMo (小米)',   url: 'https://api.xiaomimimo.com/v1/chat/completions',                     model: 'mimo-v2-pro' },
   { name: 'Groq',         url: 'https://api.groq.com/openai/v1/chat/completions',                    model: 'llama-3.3-70b-versatile' },
   { name: 'Together AI',  url: 'https://api.together.xyz/v1/chat/completions',                       model: 'meta-llama/Llama-3-70b-chat-hf' },
   { name: 'Mistral',      url: 'https://api.mistral.ai/v1/chat/completions',                         model: 'mistral-large-latest' },
