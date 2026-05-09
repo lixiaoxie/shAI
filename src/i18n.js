@@ -17,6 +17,9 @@ const messages = {
     helpPathAddDesc: '添加自定义 bin 目录',
     helpPathRmDesc: '移除自定义 bin 目录',
     helpPathListDesc: '列出自定义 bin 目录',
+    helpLearnDesc: '从 shell 历史学习命令模式',
+    helpLearnStatusDesc: '查看学习缓存状态',
+    helpLearnClearDesc: '清空学习缓存',
     helpOptions: '选项：',
     helpOptHelp: '显示帮助信息',
     helpOptVersion: '显示版本号',
@@ -106,6 +109,17 @@ const messages = {
     pathEmpty: '暂无自定义 bin 路径。使用 shai path add <目录路径> 添加。',
     pathListTitle: '自定义 bin 路径：',
 
+    // Learn
+    learnScanning: '🔍 正在扫描 shell 历史...',
+    learnComplete: '📚 已学习 {n} 条有价值的命令模式',
+    learnUpToDate: '📚 缓存已是最新（{n} 条命令）',
+    learnCleared: '已清空历史学习缓存',
+    learnStatusTitle: '📊 历史学习缓存状态：',
+    learnHistFile: '历史文件',
+    learnCacheFile: '缓存文件',
+    learnCmdCount: '已学习命令数',
+    learnLastUpdate: '最近更新',
+
     // Chat
     chatUsage: '用法：shai chat <问题>',
     chatExample: '示例：shai chat git rebase 和 merge 有什么区别',
@@ -128,6 +142,9 @@ const messages = {
     helpPathAddDesc: 'Add custom bin directory',
     helpPathRmDesc: 'Remove custom bin directory',
     helpPathListDesc: 'List custom bin directories',
+    helpLearnDesc: 'Learn command patterns from shell history',
+    helpLearnStatusDesc: 'Show learning cache status',
+    helpLearnClearDesc: 'Clear learning cache',
     helpOptions: 'Options:',
     helpOptHelp: 'Show help',
     helpOptVersion: 'Show version',
@@ -214,6 +231,17 @@ const messages = {
     pathEmpty: 'No custom bin paths. Use shai path add <directory> to add one.',
     pathListTitle: 'Custom bin paths:',
 
+    // Learn
+    learnScanning: '🔍 Scanning shell history...',
+    learnComplete: '📚 Learned {n} valuable command patterns',
+    learnUpToDate: '📚 Cache is up-to-date ({n} commands)',
+    learnCleared: 'History learning cache cleared',
+    learnStatusTitle: '📊 History learning cache status:',
+    learnHistFile: 'History file',
+    learnCacheFile: 'Cache file',
+    learnCmdCount: 'Learned commands',
+    learnLastUpdate: 'Last updated',
+
     chatUsage: 'Usage: shai chat <question>',
     chatExample: 'Example: shai chat what is the difference between git rebase and merge',
   },
@@ -260,6 +288,9 @@ ${t('helpUsage')}
   shai path add <${L === 'zh' ? '目录' : 'dir'}>        ${t('helpPathAddDesc')}
   shai path rm <${L === 'zh' ? '目录' : 'dir'}>         ${t('helpPathRmDesc')}
   shai path list              ${t('helpPathListDesc')}
+  shai learn                  ${t('helpLearnDesc')}
+  shai learn status           ${t('helpLearnStatusDesc')}
+  shai learn clear            ${t('helpLearnClearDesc')}
 
 ${t('helpOptions')}
   -h, --help                  ${t('helpOptHelp')}

@@ -18,6 +18,9 @@ import {
 import {
   loadMemory, saveMemory, removeMemory, searchMemory, getMemorySummary, clearAllMemory,
 } from '../src/memory.js';
+import {
+  learnFromHistory, getRelevantHistory, clearHistoryCache, getHistoryCacheStatus,
+} from '../src/history.js';
 import { setLanguage, t, getHelpText } from '../src/i18n.js';
 
 /**
@@ -129,6 +132,11 @@ async function main() {
       process.exit(0);
     }
     await setupInteractive();
+    // Auto-learn shell history on config setup
+    const result = learnFromHistory(true);
+    if (result.total > 0) {
+      console.error(`\n📚 ${t('learnComplete', { n: result.total })}`);
+    }
     process.exit(0);
   }
 
@@ -174,11 +182,21 @@ async function main() {
     process.exit(0);
   }
 
+  // Subcommand: learn (shell history learning)
+  if (args[0] === 'learn') {
+    handleLearnSubcommand(args.slice(1));
+    process.exit(0);
+  }
+
   // Load configuration
   let config = loadConfig();
   if (!config || !config.api_key) {
     console.error(`${t('firstTimeConfig')}\n`);
     config = await setupInteractive();
+    const result = learnFromHistory(true);
+    if (result.total > 0) {
+      console.error(`\n📚 ${t('learnComplete', { n: result.total })}`);
+    }
   }
 
   // Filter out flags, extract the query text
@@ -201,8 +219,12 @@ async function main() {
   const toolsSummary = await getSystemToolsSummary();
   const memorySummary = getMemorySummary();
 
-  // Merge tools summary and memory
-  const fullContext = [toolsSummary, memorySummary].filter(Boolean).join('\n');
+  // Auto-learn shell history (incremental, skips if already up-to-date)
+  learnFromHistory();
+  const historySummary = getRelevantHistory(query);
+
+  // Merge tools summary, memory, and history
+  const fullContext = [toolsSummary, memorySummary, historySummary].filter(Boolean).join('\n');
 
   // If pipe input exists, append to terminal context
   const effectiveCtx = pipeInput
@@ -522,6 +544,37 @@ function handlePathSubcommand(args) {
   }
 
   console.error(`${t('uiUnknownSub')} add, rm, list`);
+}
+
+function handleLearnSubcommand(args) {
+  const sub = args[0];
+
+  if (sub === '--status' || sub === 'status') {
+    const status = getHistoryCacheStatus();
+    console.error(t('learnStatusTitle'));
+    console.error(`  ${t('learnHistFile')}: ${status.histFile}`);
+    console.error(`  ${t('learnCacheFile')}: ${status.cacheFile}`);
+    console.error(`  ${t('learnCmdCount')}: ${status.commandCount}`);
+    if (status.lastUpdated) {
+      console.error(`  ${t('learnLastUpdate')}: ${status.lastUpdated}`);
+    }
+    return;
+  }
+
+  if (sub === '--clear' || sub === 'clear') {
+    clearHistoryCache();
+    console.error(`✅ ${t('learnCleared')}`);
+    return;
+  }
+
+  // Default: learn from history
+  console.error(t('learnScanning'));
+  const result = learnFromHistory(true);
+  if (result.cached) {
+    console.error(t('learnUpToDate', { n: result.total }));
+  } else {
+    console.error(t('learnComplete', { n: result.total }));
+  }
 }
 
 main().catch((e) => {

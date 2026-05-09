@@ -34,6 +34,9 @@ const SYSTEM_PROMPT = `You are shAI, a command-line assistant. The user describe
   shai path add <dir>         Add custom bin directory
   shai path rm <dir>          Remove custom bin directory
   shai path list              List custom bin directories
+  shai learn                  Learn command patterns from shell history
+  shai learn status           Show learning cache status
+  shai learn clear            Clear learning cache
   shai chat <question>        General Q&A mode`;
 
 const CHAT_SYSTEM_PROMPT = `You are shAI, a helpful command-line AI assistant. The user asks questions about terminal/shell/programming topics. Provide clear, concise answers. Rules:
